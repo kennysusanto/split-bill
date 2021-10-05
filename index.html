@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      h3 {
+        margin-bottom: 0;
+      }
+
+      ul {
+        margin-top: 0;
+      }
+
+      .errorInfo {
+        color: red;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+      }
+
+      .col {
+        width: 50%;
+        margin: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="col" id="left">
+      <h2>Users</h2>
+      <input type="text" id="userInput" placeholder="add user" />
+      <button id="btnAddUser" onclick="addUser()">add user</button>
+      <span id="userError" class="errorInfo"></span><br />
+      <h3 class="bill">List of users</h3>
+      <ul id="listUsers"></ul>
+      <hr />
+
+      <h2>Bills</h2>
+      <input
+        type="text"
+        id="billName"
+        placeholder="add bill name"
+        class="bill"
+      /><br />
+      <input
+        type="number"
+        id="billCost"
+        placeholder="add bill cost"
+        class="bill"
+      /><br />
+      <label for="billHandler" class="bill">Bill handler:</label>
+      <select name="billHandler" id="billHandler" class="bill"></select>
+      <button id="btnAddBill" onclick="addBill()" class="bill">add bill</button>
+      <span id="billError" class="errorInfo"></span>
+      <h3 class="bill">List of bills</h3>
+      <ul id="listBills" class="bill"></ul>
+      <hr />
+
+      <h2>Parts</h2>
+      <span>Bill:</span>
+      <select
+        name="selectBillName"
+        id="selectBillName"
+        class="part"
+        onchange="resetUser()"
+      ></select>
+      <span>User:</span>
+      <select name="selectUserName" id="selectUserName" class="part"></select>
+      <button id="btnAddPart" onclick="addPart()" class="part">add part</button>
+      <span id="partError" class="errorInfo"></span>
+      <h3 class="part">List of parts</h3>
+      <ul id="listParts" class="part"></ul>
+    </div>
+
+    <div class="col" id="right">
+      <h2>Calculation</h2>
+      <button id="btnCalc" onclick="calc()">Calculate</button>
+      <ul id="debtList"></ul>
+    </div>
+
+    <script>
+      var listOfUsers = [];
+      var listOfBills = [];
+      var listOfJSONUsers = [];
+      var x = document.querySelectorAll(".bill");
+      for (i = 0; i < x.length; i++) {
+        //x[i].style.enabled = "false";
+        x[i].disabled = true;
+      }
+      var y = document.querySelectorAll(".part");
+      for (i = 0; i < y.length; i++) {
+        //x[i].style.enabled = "false";
+        y[i].disabled = true;
+      }
+      document.getElementById("btnCalc").disabled = true;
+
+      function calc() {
+        var ulDebt = document.getElementById("debtList");
+        var usersJSON = [];
+        listOfUsers.forEach((el) => {
+          var tmpUser = new Object();
+          tmpUser.name = el;
+          tmpUser.debt = [];
+          tmpUser.calcDebts = [];
+          usersJSON.push(tmpUser);
+        });
+
+        // listOfBills.forEach((el) => {
+        //   var tmpDebt = new Object();
+        //   tmpDebt.bill = el.name;
+        //   tmpDebt.to = el.handler;
+        //   //tmpDebt.total = el.cost / el.participants.length;
+        //   usersJSON.forEach((el2) => {
+        //     console.log(el2.name + ' = ' + el.handler);
+        //     if (el2.name == el.handler) {
+        //       tmpDebt.total = (el.cost / el.participants.length) - el.cost;
+        //       // console.log(JSON.stringify(tmpDebt));
+        //       //console.log((el.cost / el.participants.length) - el.cost);
+        //       el2.debt.push(tmpDebt);
+        //     } else {
+        //       tmpDebt.total = el.cost / el.participants.length;
+        //       // console.log(JSON.stringify(tmpDebt));
+        //       //console.log(el.cost / el.participants.length);
+        //       el2.debt.push(tmpDebt);
+        //     }
+        //   });
+        // });
+        var strDebtList = "";
+        for (o = 0; o < listOfBills.length; o++) {
+          var el = listOfBills[o];
+          for (p = 0; p < el.participants.length; p++) {
+            var el2;
+            for (r = 0; r < usersJSON.length; r++) {
+              if (el.participants[p] == usersJSON[r].name) {
+                el2 = usersJSON[r];
+              }
+            }
+            // console.log(
+            //   el2.name +
+            //     " = " +
+            //     el.handler +
+            //     " " +
+            //     typeof el2.name +
+            //     " " +
+            //     typeof el.handler +
+            //     " " +
+            //     el2.name.length +
+            //     " " +
+            //     el.handler.length
+            // );
+            //console.log(String(el2.name.trim()) == String(el.handler.trim()));
+            //var inCalcDebts = el2.calcDebts.indexOf(tmpDebt.bill) > -1;
+            // console.log(el2.calcDebts);
+            // console.log(tmpDebt.bill);
+            // console.log(inCalcDebts);
+
+            if (
+              String(el2.name.trim().toLowerCase()) ==
+              String(el.handler.trim().toLowerCase())
+            ) {
+              // console.log(el2.name + ' masuk');
+              let tmpDebt = new Object();
+              tmpDebt.bill = el.name;
+              tmpDebt.to = el.handler;
+              tmpDebt.total = Math.abs(
+                el.cost / el.participants.length - el.cost
+              );
+              tmpDebt.payStat = "R";
+              el2.debt.push(tmpDebt);
+              // el2.calcDebts.push(tmpDebt.bill);
+              // console.log(el2.calcDebts);
+              // console.log(usersJSON[usersJSON.indexOf(el2)].calcDebts);
+              // console.log(usersJSON.indexOf(el2));
+              usersJSON[usersJSON.indexOf(el2)] = el2;
+            } else {
+              // console.log(el2.name);
+              let tmpDebt = new Object();
+              tmpDebt.bill = el.name;
+              tmpDebt.to = el.handler;
+              tmpDebt.total = el.cost / el.participants.length;
+              tmpDebt.payStat = "P";
+              el2.debt.push(tmpDebt);
+              // el2.calcDebts.push(tmpDebt.bill);
+              // console.log(el2.calcDebts);
+              // console.log(usersJSON[usersJSON.indexOf(el2)].calcDebts);
+              // console.log(usersJSON.indexOf(el2));
+              usersJSON[usersJSON.indexOf(el2)] = el2;
+            }
+            // console.log(JSON.stringify(tmpDebt));
+            // strDebtList += "<li>" + el2.name + "<ul>";
+            // for (q = 0; q < el2.debt.length; q++) {
+            //   var el3 = el2.debt[q];
+            //   //console.log(el3);
+            //   if (el3.payStat == "P") {
+            //     strDebtList +=
+            //       "<li>Bill: " +
+            //       el3.bill +
+            //       ", Pay: " +
+            //       el3.total +
+            //       ", To: " +
+            //       el3.to;
+            //   } else if (el3.payStat == "R") {
+            //     strDebtList +=
+            //       "<li>Bill: " + el3.bill + ", Receive: " + el3.total;
+            //   }
+            //   strDebtList += "</li>";
+            // }
+            // strDebtList += "</ul></li>";
+            // console.log(JSON.stringify(el2));
+          }
+        }
+
+        for (e = 0; e < usersJSON.length; e++) {
+          strDebtList +=
+            "<li>" +
+            usersJSON[e].name + "<ul>";
+          
+          for (f = 0; f < usersJSON[e].debt.length; f++) {
+            strDebtList += "<li>Bill: " + usersJSON[e].debt[f].bill + ", ";
+              if (usersJSON[e].debt[f].payStat == 'R') {
+                strDebtList +=  "Receive: " + usersJSON[e].debt[f].total;
+              } else if (usersJSON[e].debt[f].payStat == 'P') {
+                strDebtList += "Pay: " + usersJSON[e].debt[f].total + ", To: " + usersJSON[e].debt[f].to;
+              }              
+              strDebtList += "</li>";
+          }
+
+          strDebtList += "</ul></li>";
+        }
+        ulDebt.innerHTML = strDebtList;
+      }
+
+      function addUser() {
+        setUserError("");
+        var userInput = document.getElementById("userInput");
+        var listUsers = document.getElementById("listUsers");
+        var selectBillHandler = document.getElementById("billHandler");
+        var selectUserName = document.getElementById("selectUserName");
+        var newUser = userInput.value;
+        if (newUser != "") {
+          checkForDupes(listOfUsers, newUser)
+            ? setUserError("Duplicate name!")
+            : listOfUsers.push(newUser);
+          var userListString = "";
+          listOfUsers.forEach((el) => {
+            userListString += "<li>" + el + "</li>";
+          });
+          var handlerListString = "";
+          listOfUsers.forEach((el) => {
+            handlerListString +=
+              '<option value="' + el.toLowerCase() + '">' + el + "</option>";
+          });
+          listUsers.innerHTML = userListString;
+          selectBillHandler.innerHTML = handlerListString;
+          selectUserName.innerHTML = handlerListString;
+          userInput.value = "";
+          userInput.focus();
+          if (listOfUsers.length > 0) {
+            var x = document.querySelectorAll(".bill");
+            for (i = 0; i < x.length; i++) {
+              //x[i].style.enabled = "true";
+              x[i].disabled = false;
+            }
+          }
+        } else {
+          setUserError("User name is empty!");
+        }
+      }
+
+      function addBill() {
+        var billName = document.getElementById("billName");
+        var billCost = document.getElementById("billCost");
+        var selectBillHandler = document.getElementById("billHandler");
+        var listBills = document.getElementById("listBills");
+        var selectBillName = document.getElementById("selectBillName");
+        var listParts = document.getElementById("listParts");
+
+        if (billName.value != "" && billCost.value != "") {
+          setBillError("");
+          var bill = new Object();
+          bill.name = billName.value;
+          bill.cost = billCost.value;
+          bill.handler = selectBillHandler.value;
+          bill.participants = [];
+          //var jsonString = JSON.stringify(bill);
+          var tmpListOfBillNames = [];
+          listOfBills.forEach((el) => {
+            tmpListOfBillNames.push(el.name);
+          });
+          //listOfBills.push(jsonString);
+          checkForDupes(tmpListOfBillNames, bill.name)
+            ? setBillError("Duplicate bill name!")
+            : listOfBills.push(bill);
+
+          var billListString = "";
+          var billNamesList = "";
+          var strPartList = "";
+          listOfBills.forEach((el) => {
+            billListString +=
+              "<li>Bill name: " +
+              el.name +
+              ", Bill cost: " +
+              el.cost +
+              ", Bill handler: " +
+              el.handler +
+              "</li>";
+            strPartList +=
+              "<li>Bill name: " +
+              el.name +
+              ", Bill cost: " +
+              el.cost +
+              ", Bill handler: " +
+              el.handler +
+              ", Bill participants: " +
+              el.participants +
+              "</li>";
+            billNamesList +=
+              '<option value="' +
+              el.name.toLowerCase() +
+              '">' +
+              el.name +
+              "</option>";
+          });
+          listBills.innerHTML = billListString;
+          selectBillName.innerHTML = billNamesList;
+          listParts.innerHTML = strPartList;
+          billName.value = "";
+          billCost.value = "";
+          billName.focus();
+          selectBillHandler.value =
+            selectBillHandler.getElementsByTagName("option")[0].value;
+
+          if (listOfUsers.length > 0 && listOfBills.length > 0) {
+            var y = document.querySelectorAll(".part");
+            for (i = 0; i < y.length; i++) {
+              //x[i].style.enabled = "false";
+              y[i].disabled = false;
+            }
+          }
+        } else {
+          setBillError("Bill name or bill cost is empty!");
+        }
+      }
+
+      function addPart() {
+        setPartError("");
+        var selectBillName = document.getElementById("selectBillName");
+        var selectUserName = document.getElementById("selectUserName");
+        var listParts = document.getElementById("listParts");
+        var billName = selectBillName.value;
+        var userName = selectUserName.value;
+        var bill = findBill(billName);
+
+        checkForDupes(bill.participants, userName)
+          ? setPartError("Duplicate participant!")
+          : bill.participants.push(userName);
+
+        var strPartList = "";
+        var c = 0;
+        listOfBills.forEach((el) => {
+          strPartList +=
+            "<li>Bill name: " +
+            el.name +
+            ", Bill cost: " +
+            el.cost +
+            ", Bill handler: " +
+            el.handler +
+            ", Bill participants: " +
+            el.participants +
+            "</li>";
+
+          if (el.participants.length > 0) {
+            c += 1;
+          }
+        });
+        listParts.innerHTML = strPartList;
+        if (c == listOfBills.length) {
+          document.getElementById("btnCalc").disabled = false;
+        }
+      }
+
+      function findBill(billName) {
+        var l = listOfBills;
+        try {
+          for (i = 0; i < l.length; i++) {
+            if (l[i].name == billName) {
+              return l[i];
+            }
+          }
+        } catch (exception_var) {
+          console.log(exception_var);
+          console.log("error at findBill");
+        }
+      }
+
+      function checkForDupes(al, strToCheck) {
+        for (i = 0; i < al.length; i++) {
+          if (al[i] == strToCheck) {
+            return true;
+            break;
+          }
+        }
+        return false;
+      }
+
+      function setUserError(str) {
+        document.getElementById("userError").innerHTML = str;
+      }
+
+      function setBillError(str) {
+        document.getElementById("billError").innerHTML = str;
+      }
+
+      function setPartError(str) {
+        document.getElementById("partError").innerHTML = str;
+      }
+
+      function resetUser() {
+        document.getElementById("selectUserName").value = document
+          .getElementById("selectUserName")
+          .getElementsByTagName("option")[0].value;
+      }
+    </script>
+  </body>
+</html>
