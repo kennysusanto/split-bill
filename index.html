@@ -82,7 +82,7 @@
       <button id="btnCalc" onclick="calc()">Calculate</button>
       <ul id="debtList"></ul>
 
-      <span>v1.1</span>
+      <span><small>v1.2</small></span>
     </div>
 
     <script>
@@ -409,10 +409,14 @@
       }
 
       function checkForDupes(al, strToCheck) {
-        for (i = 0; i < al.length; i++) {
-          if (al[i] == strToCheck) {
-            return true;
-            break;
+        if (al == undefined) {
+          return false;
+        } else {
+          for (i = 0; i < al.length; i++) {
+            if (al[i] == strToCheck) {
+              return true;
+              break;
+            }
           }
         }
         return false;
