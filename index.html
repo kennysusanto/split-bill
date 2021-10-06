@@ -82,7 +82,7 @@
       <button id="btnCalc" onclick="calc()">Calculate</button>
       <ul id="debtList"></ul>
 
-      <span><small>v1.4</small></span>
+      <span><small>v1.5</small></span>
     </div>
 
     <script>
@@ -399,7 +399,7 @@
         var l = listOfBills;
         try {
           for (i = 0; i < l.length; i++) {
-            if (l[i].name == billName) {
+            if (String(l[i].name) == String(billName)) {
               return l[i];
             }
           }
