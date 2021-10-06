@@ -82,7 +82,7 @@
       <button id="btnCalc" onclick="calc()">Calculate</button>
       <ul id="debtList"></ul>
 
-      <span><small>v1.6</small></span>
+      <span><small>v1.7</small></span>
     </div>
 
     <script>
@@ -257,7 +257,7 @@
           var handlerListString = "";
           listOfUsers.forEach((el) => {
             handlerListString +=
-              '<option value="' + el.toLowerCase() + '">' + el + "</option>";
+              '<option value="' + el + '">' + el + "</option>";
           });
           listUsers.innerHTML = userListString;
           selectBillHandler.innerHTML = handlerListString;
@@ -325,7 +325,7 @@
               "</li>";
             billNamesList +=
               '<option value="' +
-              el.name.toLowerCase() +
+              el.name +
               '">' +
               el.name +
               "</option>";
