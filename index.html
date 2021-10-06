@@ -164,7 +164,7 @@
               String(el.handler.trim().toLowerCase())
             ) {
               // console.log(el2.name + ' masuk');
-              let tmpDebt = new Object();
+              var tmpDebt = new Object();
               tmpDebt.bill = el.name;
               tmpDebt.to = el.handler;
               tmpDebt.total = Math.abs(
@@ -179,7 +179,7 @@
               usersJSON[usersJSON.indexOf(el2)] = el2;
             } else {
               // console.log(el2.name);
-              let tmpDebt = new Object();
+              var tmpDebt = new Object();
               tmpDebt.bill = el.name;
               tmpDebt.to = el.handler;
               tmpDebt.total = el.cost / el.participants.length;
@@ -216,18 +216,20 @@
         }
 
         for (e = 0; e < usersJSON.length; e++) {
-          strDebtList +=
-            "<li>" +
-            usersJSON[e].name + "<ul>";
-          
+          strDebtList += "<li>" + usersJSON[e].name + "<ul>";
+
           for (f = 0; f < usersJSON[e].debt.length; f++) {
             strDebtList += "<li>Bill: " + usersJSON[e].debt[f].bill + ", ";
-              if (usersJSON[e].debt[f].payStat == 'R') {
-                strDebtList +=  "Receive: " + usersJSON[e].debt[f].total;
-              } else if (usersJSON[e].debt[f].payStat == 'P') {
-                strDebtList += "Pay: " + usersJSON[e].debt[f].total + ", To: " + usersJSON[e].debt[f].to;
-              }              
-              strDebtList += "</li>";
+            if (usersJSON[e].debt[f].payStat == "R") {
+              strDebtList += "Receive: " + usersJSON[e].debt[f].total;
+            } else if (usersJSON[e].debt[f].payStat == "P") {
+              strDebtList +=
+                "Pay: " +
+                usersJSON[e].debt[f].total +
+                ", To: " +
+                usersJSON[e].debt[f].to;
+            }
+            strDebtList += "</li>";
           }
 
           strDebtList += "</ul></li>";
@@ -348,39 +350,43 @@
       }
 
       function addPart() {
-        setPartError("");
-        var selectBillName = document.getElementById("selectBillName");
-        var selectUserName = document.getElementById("selectUserName");
-        var listParts = document.getElementById("listParts");
-        var billName = selectBillName.value;
-        var userName = selectUserName.value;
-        var bill = findBill(billName);
+        try {
+          setPartError("");
+          var selectBillName = document.getElementById("selectBillName");
+          var selectUserName = document.getElementById("selectUserName");
+          var listParts = document.getElementById("listParts");
+          var billName = selectBillName.value;
+          var userName = selectUserName.value;
+          var bill = findBill(billName);
 
-        checkForDupes(bill.participants, userName)
-          ? setPartError("Duplicate participant!")
-          : bill.participants.push(userName);
+          checkForDupes(bill.participants, userName)
+            ? setPartError("Duplicate participant!")
+            : bill.participants.push(userName);
 
-        var strPartList = "";
-        var c = 0;
-        listOfBills.forEach((el) => {
-          strPartList +=
-            "<li>Bill name: " +
-            el.name +
-            ", Bill cost: " +
-            el.cost +
-            ", Bill handler: " +
-            el.handler +
-            ", Bill participants: " +
-            el.participants +
-            "</li>";
+          var strPartList = "";
+          var c = 0;
+          listOfBills.forEach((el) => {
+            strPartList +=
+              "<li>Bill name: " +
+              el.name +
+              ", Bill cost: " +
+              el.cost +
+              ", Bill handler: " +
+              el.handler +
+              ", Bill participants: " +
+              el.participants +
+              "</li>";
 
-          if (el.participants.length > 0) {
-            c += 1;
+            if (el.participants.length > 0) {
+              c += 1;
+            }
+          });
+          listParts.innerHTML = strPartList;
+          if (c == listOfBills.length) {
+            document.getElementById("btnCalc").disabled = false;
           }
-        });
-        listParts.innerHTML = strPartList;
-        if (c == listOfBills.length) {
-          document.getElementById("btnCalc").disabled = false;
+        } catch (exception_varr) {
+          alert("error at addParts");
         }
       }
 
@@ -395,6 +401,7 @@
         } catch (exception_var) {
           console.log(exception_var);
           console.log("error at findBill");
+          alert("error at findBill");
         }
       }
 
