@@ -399,7 +399,7 @@
         var l = listOfBills;
         try {
           for (i = 0; i < l.length; i++) {
-            alert(l[i]);
+            alert(JSON.stringify(l[i]));
             if (String(l[i].name) == String(billName)) {
               return l[i];
             }
